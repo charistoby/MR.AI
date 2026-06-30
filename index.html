@@ -4,13 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MR.AI - Your Maths Tutor</title>
-
 <script>
 window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.js"></script>
-
 <style>
 :root{
   --bg: #0d1117;
@@ -22,181 +20,66 @@ window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}};
   --accent: #dc2626;
   --input-bg: #111827;
   --border: #374151;
+  --green: #16a34a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{
-  height:100%;
-  width:100%;
-  overflow:hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg);
-}
-.app{
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  background: var(--chat-bg);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-.header{
-  background: var(--header);
-  color: var(--text);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.avatar{
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
+html,body{height:100%;width:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg)}
+.app{width:100vw;height:100vh;height:100dvh;background:var(--chat-bg);display:flex;flex-direction:column;position:relative}
+.header{background:var(--header);color:var(--text);padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.avatar{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .name-status{flex:1;min-width:0}
 .name-status.name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .name-status.status{font-size:11px;color:#9ca3af}
-.menu-btn{
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 24px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.menu-btn:active{background: var(--input-bg)}
-.menu-box{
-  position: absolute;
-  top: 56px;
-  right: 12px;
-  background: var(--header);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 100;
-  display: none;
-  min-width: 180px;
-  overflow: hidden;
-}
-.menu-box.show{display: block}
-.menu-item{
-  padding: 12px 16px;
-  color: var(--text);
-  font-size: 14px;
-  cursor: pointer;
-  border-bottom: 1px solid var(--border);
-}
-.menu-item:last-child{border-bottom: none}
-.menu-item:active{background: var(--input-bg)}
-.menu-item.red{color: var(--accent)}
-.chat{
-  flex: 1;
-  padding: 10px 6px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background-image:
-    radial-gradient(circle at 20% 50%, rgba(30, 58, 138, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
-}
-.msg{
-  margin: 2px 8px 10px 8px;
-  padding: 7px 12px;
-  border-radius: 8px;
-  max-width: 82%;
-  color: var(--text);
-  word-wrap: break-word;
-  line-height: 1.4;
-  font-size: 15px;
-  animation: pop 0.15s ease;
-}
+.menu-btn{background:none;border:none;color:var(--text);font-size:24px;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.menu-btn:active{background:var(--input-bg)}
+.menu-box{position:absolute;top:56px;right:12px;background:var(--header);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:100;display:none;min-width:180px;overflow:hidden}
+.menu-box.show{display:block}
+.menu-item{padding:12px 16px;color:var(--text);font-size:14px;cursor:pointer;border-bottom:1px solid var(--border)}
+.menu-item:last-child{border-bottom:none}
+.menu-item:active{background:var(--input-bg)}
+.menu-item.red{color:var(--accent)}
+.chat{flex:1;padding:10px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;background-image:radial-gradient(circle at 20% 50%,rgba(30,58,138,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(124,58,237,0.1) 0%,transparent 50%)}
+.msg{margin:2px 8px 10px 8px;padding:10px 12px;border-radius:8px;max-width:85%;color:var(--text);word-wrap:break-word;line-height:1.6;font-size:15px;animation:pop 0.15s ease}
 @keyframes pop{from{transform:scale(0.98);opacity:0}to{transform:scale(1);opacity:1}}
-.bot{
-  background: var(--bot-msg);
-  border-bottom-left-radius: 2px;
-  margin-right: auto;
+.bot{background:var(--bot-msg);border-bottom-left-radius:2px;margin-right:auto}
+.user{background:var(--user-msg);border-bottom-right-radius:2px;margin-left:auto}
+.msg img{max-width:100%;border-radius:6px;margin-top:6px;display:block}
+.msg u{text-decoration:underline;text-decoration-color:#60a5fa;text-underline-offset:3px}
+.calc{font-size:11px;color:#93c5fd;margin-top:3px;font-style:italic}
+.time{font-size:10px;color:rgba(229,231,235,0.6);margin-top:6px;text-align:right;display:flex;justify-content:space-between;align-items:center}
+.speak-btn{background:none;border:none;color:#93c5fd;font-size:14px;cursor:pointer;padding:0 4px}
+.speak-btn:active{opacity:0.6}
+
+/* JAMB Style Test Options */
+.test-options{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.test-option{
+  background:rgba(255,255,255,0.1);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  text-align:left;
+  font-size:14px;
+  transition:all 0.1s;
 }
-.user{
-  background: var(--user-msg);
-  border-bottom-right-radius: 2px;
-  margin-left: auto;
-}
-.msg img{
-  max-width: 100%;
-  border-radius: 6px;
-  margin-top: 6px;
-  display: block;
-}
-.calc{
-  font-size: 11px;
-  color: #93c5fd;
-  margin-top: 3px;
-  font-style: italic;
-}
-.time{
-  font-size: 10px;
-  color: rgba(229,231,235,0.6);
-  margin-top: 3px;
-  text-align: right;
-}
-.input-area{
-  display: flex;
-  padding: 6px 8px;
-  padding-bottom: max(6px, env(safe-area-inset-bottom));
-  background: var(--header);
-  gap: 6px;
-  align-items: center;
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-}
-.input-area input{
-  flex: 1;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 20px;
-  background: var(--input-bg);
-  color: var(--text);
-  font-size: 16px;
-  outline: none;
-}
-.icon-btn{
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.camera-btn{background: var(--user-msg)}
-.mic-btn{background: var(--accent)}
-.mic-btn.listening{background: #16a34a; animation: pulse 1.5s infinite}
-.mic-btn:disabled{background: #4b5563; opacity: 0.5}
+.test-option:active{background:rgba(255,255,255,0.2)}
+.test-option.selected{background:var(--user-msg);border-color:var(--user-msg)}
+.test-option.correct{background:var(--green);border-color:var(--green)}
+.test-option.wrong{background:var(--accent);border-color:var(--accent)}
+
+.input-area{display:flex;padding:6px 8px;padding-bottom:max(6px,env(safe-area-inset-bottom));background:var(--header);gap:6px;align-items:center;border-top:1px solid var(--border);flex-shrink:0;position:sticky;bottom:0}
+.input-area input{flex:1;padding:10px 16px;border:none;border-radius:20px;background:var(--input-bg);color:var(--text);font-size:16px;outline:none}
+.icon-btn{color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.camera-btn{background:var(--user-msg)}
+.mic-btn{background:var(--accent)}
+.mic-btn.listening{background:var(--green);animation:pulse 1.5s infinite}
+.mic-btn:disabled{background:#4b5563;opacity:0.5}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-.send-btn{background: var(--bot-msg)}
+.send-btn{background:var(--bot-msg)}
 .icon-btn:active{opacity:0.7}
 #imageInput{display:none}
-@media (min-width: 500px){
-.app{max-width:480px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
-}
+@media (min-width: 500px){.app{max-width:480px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}}
 </style>
 </head>
 <body>
@@ -209,10 +92,10 @@ html,body{
     </div>
     <button class="menu-btn" onclick="toggleMenu()">⋮</button>
     <div class="menu-box" id="menuBox">
-      <div class="menu-item" onclick="quickAction('Test: Algebra | Class: SSS2 | Qs: 5 | Type: Mixed')">📝 Generate Test</div>
-      <div class="menu-item" onclick="quickAction('Explain $x^2 + 5x + 6 = 0$')">📚 Explain Topic</div>
-      <div class="menu-item" onclick="quickAction('Give me 1 practice question on logarithms')">✏️ Practice</div>
-      <div class="menu-item" onclick="quickAction('What class am I in?')">📋 My Details</div>
+      <div class="menu-item" onclick="quickAction('Test: Algebra | Class: SSS1 | Qs: 5 | Type: Objectives')">📝 JAMB Test</div>
+      <div class="menu-item" onclick="quickAction('Explain $x + 2 = 5$ step by step')">📚 Simple Explain</div>
+      <div class="menu-item" onclick="quickAction('I am in JSS3. Teach me slowly.')">🐢 Slow Mode</div>
+      <div class="menu-item" onclick="quickAction('What class am I in?')">📋 My Level</div>
       <div class="menu-item red" onclick="clearChat()">🗑️ Clear Chat</div>
     </div>
   </div>
@@ -227,110 +110,86 @@ html,body{
 </div>
 
 <script>
-const KEY = "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";
 let memory = JSON.parse(localStorage.getItem('mrai')||'{}');
 let history = [];
 let recognition = null;
 let isListening = false;
+let currentTest = null; // For tracking JAMB tests
 const chat = document.getElementById('chat');
 const input = document.getElementById('msg');
 const menuBox = document.getElementById('menuBox');
 const micBtn = document.getElementById('micBtn');
 const imageInput = document.getElementById('imageInput');
 
-// IMPROVED MIC SETUP
 function initMic(){
   if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
     micBtn.disabled = true;
-    micBtn.title = "Voice not supported on this browser";
+    micBtn.title = "Voice not supported";
     return;
   }
-
-  // Check if HTTPS - required for mic
   if (location.protocol!== 'https:' && location.hostname!== 'localhost') {
     micBtn.disabled = true;
-    micBtn.title = "Mic needs HTTPS. Host this file online to enable voice.";
+    micBtn.title = "Mic needs HTTPS";
     return;
   }
-
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.lang = 'en-US';
   recognition.interimResults = false;
-
   recognition.onstart = () => {
     isListening = true;
     micBtn.classList.add('listening');
     micBtn.innerHTML = '🔴';
     input.placeholder = "Listening...";
   };
-
   recognition.onend = () => {
     isListening = false;
     micBtn.classList.remove('listening');
     micBtn.innerHTML = '🎤';
     input.placeholder = "Message MR.AI...";
   };
-
   recognition.onresult = (e) => {
-    const transcript = e.results[0][0].transcript;
-    input.value = transcript;
+    input.value = e.results[0][0].transcript;
     send();
   };
-
   recognition.onerror = (e) => {
     isListening = false;
     micBtn.classList.remove('listening');
     micBtn.innerHTML = '🎤';
     input.placeholder = "Message MR.AI...";
     let msg = "Mic error. ";
-    if(e.error === 'not-allowed') msg += "Allow microphone permission in browser.";
-    else if(e.error === 'no-speech') msg += "I didn't hear anything. Try again.";
-    else msg += "Try typing instead.";
+    if(e.error === 'not-allowed') msg += "Allow microphone permission.";
+    else if(e.error === 'no-speech') msg += "Didn't hear anything.";
+    else msg += "Try typing.";
     addMsg(msg,"bot");
   };
 }
 
 function toggleMic(){
-  if(!recognition) return addMsg("Voice not supported. Use Chrome or Edge.","bot");
+  if(!recognition) return addMsg("Voice not supported. Use Chrome.","bot");
   if(isListening) recognition.stop();
   else {
-    try {
-      recognition.start();
-    } catch(e) {
-      addMsg("Mic busy. Try again in 1 sec.","bot");
-    }
+    try { recognition.start(); } catch(e) { addMsg("Mic busy. Try again.","bot"); }
   }
 }
 
-const PROMPT = `You are MR.AI, Professor of Mathematics for Nigerian SSS1-SSS3 students.
-
-CRITICAL RULES:
-1. BE BRIEF. Max 3 lines per reply unless showing worked example. No stories.
-2. ALL math MUST use LaTeX: $x^2$, $\\frac{1}{2}$, $\\sqrt{9}$, $2+2=4$. Never plain text math.
-3. Structure: Explain [1 line] → Example [show working] → Practice [1 question].
-4. For ANY question, answer like a professor: brief, accurate, then back to Maths.
-5. When given an image, read the maths question in it and solve it step by step using LaTeX.
-
-Identity: MR.AI. Maths/Further Maths only. Other subjects: Brief answer, then "Back to Maths. Topic?"
-
-Class-Adaptive:
-SSS1: Simple. $2+2=4$ [Adding]
-SSS2: Standard. $\\frac{dy}{dx}$ = rate of change
-SSS3: Technical. Skip basics.
-
-TEST: \`Test: [Topic] | Class: [SSS1/2/3] | Qs: [Number] | Type: [Objectives/Theory/Mixed] | Time: [Minutes]\`
-Start: \`Objective: By the end...\` WAEC style. No answers until "Submit".
-
-Greetings: "Hello. Class and topic?" or "Hi $${memory.name || ''}$. Topic?"
-
-Opening: "Good day. I’m MR.AI. Class and topic?"`;
+// NEW: Speech function for MR.AI to talk
+function speakText(text){
+  if(!('speechSynthesis' in window)) return alert("Your browser can't speak");
+  speechSynthesis.cancel(); // Stop any current speech
+  // Remove LaTeX and HTML for cleaner speech
+  let clean = text.replace(/\$[^$]+\$/g, '').replace(/<[^>]+>/g, '').replace(/_/g, ' ');
+  const utterance = new SpeechSynthesisUtterance(clean);
+  utterance.rate = 0.9; // Slightly slower for students
+  utterance.pitch = 1;
+  speechSynthesis.speak(utterance);
+}
 
 window.onload = ()=>{
   initMic();
-  let start = "Good day. I’m MR.AI. Class and topic?";
-  if(memory.name) start = `Welcome back $${memory.name}$. Topic?`;
+  let start = "Hello. I am MR.AI.\n\nWhat <u>class</u> are you in?\nWhat <u>topic</u> do you want?";
+  if(memory.name) start = `Welcome back <u>${memory.name}</u>.\n\nWhat topic today?`;
   addMsg(start,"bot");
   input.focus();
 }
@@ -351,7 +210,8 @@ function clearChat(){
   if(confirm("Clear all messages?")){
     chat.innerHTML = "";
     history = [];
-    addMsg("Chat cleared. Topic?","bot");
+    currentTest = null;
+    addMsg("Chat cleared.\n\nWhat topic?","bot");
   }
   menuBox.classList.remove('show');
 }
@@ -375,25 +235,79 @@ function getTime(){
   return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 }
 
-function addMsg(txt,who,calc){
+function addMsg(txt,who,calc,testData){
   const div = document.createElement('div');
   div.className = 'msg '+who;
-  div.innerHTML = txt + `<div class="time">${getTime()}</div>`;
-  if(calc) div.innerHTML = `<div class="calc">${txt}</div><div class="time">${getTime()}</div>`;
+
+  let html = txt;
+
+  // Add JAMB-style buttons if this is a test question
+  if(testData && testData.options){
+    html += '<div class="test-options">';
+    testData.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i); // A, B, C, D
+      html += `<button class="test-option" onclick="selectAnswer(${testData.qid}, '${letter}')">${letter}. ${opt}</button>`;
+    });
+    html += '</div>';
+  }
+
+  // Add speak button for bot messages
+  let timeHtml = `<div class="time">${getTime()}`;
+  if(who === 'bot' &&!calc) {
+    timeHtml += `<button class="speak-btn" onclick="speakText(\`${txt.replace(/`/g, '\\`')}\`)">🔊</button>`;
+  }
+  timeHtml += '</div>';
+
+  div.innerHTML = html + timeHtml;
+  if(calc) div.innerHTML = `<div class="calc">${txt}</div>${timeHtml}`;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
   if(window.MathJax) MathJax.typesetPromise([div]);
 }
 
+// NEW: Handle JAMB button clicks
+function selectAnswer(qid, answer){
+  if(!currentTest || currentTest[qid].answered) return;
+  currentTest[qid].userAnswer = answer;
+  currentTest[qid].answered = true;
+
+  // Visual feedback
+  const buttons = document.querySelectorAll(`.msg:last-child.test-option`);
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    if(btn.textContent.startsWith(answer)) btn.classList.add('selected');
+    if(btn.textContent.startsWith(currentTest[qid].correct)) btn.classList.add('correct');
+    else if(btn.textContent.startsWith(answer)) btn.classList.add('wrong');
+  });
+
+  // Check if test complete
+  const allAnswered = Object.values(currentTest).every(q => q.answered);
+  if(allAnswered){
+    let score = Object.values(currentTest).filter(q => q.userAnswer === q.correct).length;
+    let total = Object.keys(currentTest).length;
+    setTimeout(() => {
+      addMsg(`Test Done.\n\n<u>Your Score</u>: ${score}/${total}\n\nSay "Submit" to see corrections.`, "bot");
+    }, 500);
+  }
+}
+
 function localReply(txt){
   txt = txt.toLowerCase().trim();
   if(/^(hello|hi|hey|good morning|good afternoon|good evening|good day|hello\?|hi\?|yo)$/.test(txt)){
-    return memory.name? `Hello $${memory.name}$. Topic?` : "Hello. Class and topic?";
+    return memory.name? `Hello <u>${memory.name}</u>.\n\nWhat topic?` : "Hello.\n\nWhat <u>class</u> are you in?\nWhat <u>topic</u>?";
+  }
+  if(/too fast|slow down|repeat|don't understand/i.test(txt)){
+    return "Ok, I will go <u>slower</u>.\n\nWe do <u>small small steps</u>.\n\nTell me the topic again.";
+  }
+  if(/jss|primary|basic/i.test(txt)){
+    memory.level = 'basic';
+    localStorage.setItem('mrai',JSON.stringify(memory));
+    return "Ok.\n\nI will use <u>very simple words</u>.\n\nNo hard grammar.\n\nWhat topic?";
   }
   try{
     if(/^[0-9+\-*/^().\s]+$/.test(txt) && txt.match(/[0-9]/)){
       let ans = math.evaluate(txt);
-      return `$${txt} = ${ans}$ [Calculator]`;
+      return `$${txt} = ${ans}$\n\n[Calculator]`;
     }
   }catch(e){}
   return null;
@@ -402,49 +316,43 @@ function localReply(txt){
 function saveMem(txt){
   let name = txt.match(/my name is (\w+)|i'm (\w+)|i am (\w+)/i);
   if(name &&!memory.name) memory.name = name[1]||name[2]||name[3];
-  let cls = txt.match(/SSS[123]/i);
-  if(cls &&!memory.class) memory.class = cls[0].toUpperCase();
+  let cls = txt.match(/SSS[123]|JSS[123]|Primary [1-6]|Basic [1-6]/i);
+  if(cls) {
+    memory.class = cls[0].toUpperCase();
+    if(/JSS|Primary|Basic/i.test(cls[0])) memory.level = 'basic';
+  }
   localStorage.setItem('mrai',JSON.stringify(memory));
 }
 
 async function sendToAIWithImage(base64Image){
-  addMsg("Scanning image...","bot");
+  addMsg("Reading your picture...","bot");
   try{
-    let systemMsg = PROMPT + `\nStudent Memory: ${JSON.stringify(memory)}`;
-    let msgs = [
-      {role:"system",content:systemMsg},
-    ...history,
-      {
-        role:"user",
-        content: [
-          {type: "text", text: "Solve this maths question from the image. Be brief. Use LaTeX $...$ for all math."},
-          {type: "image_url", image_url: {url: base64Image}}
-        ]
-      }
-    ];
-
-    let res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+    let res = await fetch("/api/vision",{
       method:"POST",
-      headers:{"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:"llama-3.2-11b-vision-preview",
-        messages:msgs,
-        temperature:0.2,
-        max_tokens:500
+        image: base64Image,
+        history: history,
+        memory: memory
       })
     });
-
     if(!res.ok) throw new Error("API error");
     let data = await res.json();
-    let reply = data.choices[0].message.content;
     chat.removeChild(chat.lastChild);
-    addMsg(reply,"bot");
-    history.push({role:"user",content:"[Image sent]"},{role:"assistant",content:reply});
-    if(history.length > 10) history = history.slice(-10);
 
+    // Check if response contains test data
+    if(data.testData){
+      currentTest = data.testData;
+      addMsg(data.reply,"bot",false,data.testData[0]); // Pass first question
+    } else {
+      addMsg(data.reply,"bot");
+    }
+
+    history.push({role:"user",content:"[Image sent]"},{role:"assistant",content:data.reply});
+    if(history.length > 10) history = history.slice(-10);
   }catch(e){
     chat.removeChild(chat.lastChild);
-    addMsg("Can't read image. Try typing the question or check internet.","bot");
+    addMsg("Can't read image.\n\nType the question.","bot");
   }
 }
 
@@ -461,35 +369,43 @@ async function send(){
   try{
     if(/^[0-9+\-*/^().\s]+$/.test(txt.trim())){
       let ans = math.evaluate(txt);
-      addMsg(`[Calculator: $${txt} = ${ans}$]`,"bot",true);
+      addMsg(`[Calculator]\n\n$${txt} = ${ans}$`,"bot",true);
     }
   }catch(e){}
 
-  addMsg("typing...","bot");
+  addMsg("MR.AI is thinking...","bot");
 
   try{
-    let systemMsg = PROMPT + `\nStudent Memory: ${JSON.stringify(memory)}`;
-    let msgs = [{role:"system",content:systemMsg},...history,{role:"user",content:txt}];
-
-    let res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+    let res = await fetch("/api/chat",{
       method:"POST",
-      headers:{"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},
-      body:JSON.stringify({model:"llama-3.1-8b-instant",messages:msgs,temperature:0.2})
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        message: txt,
+        history: history,
+        memory: memory
+      })
     });
-
     if(!res.ok) throw new Error("API error");
     let data = await res.json();
-    let reply = data.choices[0].message.content;
     chat.removeChild(chat.lastChild);
-    addMsg(reply,"bot");
-    history.push({role:"user",content:txt},{role:"assistant",content:reply});
-    if(history.length > 10) history = history.slice(-10);
 
+    // Check if response contains test data
+    if(data.testData){
+      currentTest = data.testData;
+      // Send first question with buttons
+      const firstQ = Object.values(data.testData)[0];
+      addMsg(firstQ.question,"bot",false,firstQ);
+    } else {
+      addMsg(data.reply,"bot");
+    }
+
+    history.push({role:"user",content:txt},{role:"assistant",content:data.reply});
+    if(history.length > 10) history = history.slice(-10);
   }catch(e){
     chat.removeChild(chat.lastChild);
-    addMsg("Connection error. Try $2+2$ - works offline.","bot");
+    addMsg("Network error.\n\nTry $2+2$","bot");
   }
 }
 </script>
 </body>
-  </html>
+</html>
