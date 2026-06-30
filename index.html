@@ -109,12 +109,15 @@ html,body{height:100%;width:100%;overflow:hidden;font-family:-apple-system,Blink
   </div>
 </div>
 
-<script>
+}
+
+// NEW: Handle JAMB button clicks<script>
 let memory = JSON.parse(localStorage.getItem('mrai')||'{}');
 let history = [];
 let recognition = null;
 let isListening = false;
-let currentTest = null; // For tracking JAMB tests
+let currentTest = {}; // Changed: now stores all questions
+let currentQuestionIndex = 0;
 const chat = document.getElementById('chat');
 const input = document.getElementById('msg');
 const menuBox = document.getElementById('menuBox');
@@ -174,21 +177,19 @@ function toggleMic(){
   }
 }
 
-// NEW: Speech function for MR.AI to talk
 function speakText(text){
-  if(!('speechSynthesis' in window)) return alert("Your browser can't speak");
-  speechSynthesis.cancel(); // Stop any current speech
-  // Remove LaTeX and HTML for cleaner speech
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
   let clean = text.replace(/\$[^$]+\$/g, '').replace(/<[^>]+>/g, '').replace(/_/g, ' ');
   const utterance = new SpeechSynthesisUtterance(clean);
-  utterance.rate = 0.9; // Slightly slower for students
+  utterance.rate = 0.9;
   utterance.pitch = 1;
   speechSynthesis.speak(utterance);
 }
 
 window.onload = ()=>{
   initMic();
-  let start = "Hello. I am MR.AI.\n\nWhat <u>class</u> are you in?\nWhat <u>topic</u> do you want?";
+  let start = "Hello.\n\nI am MR.AI.\n\nWhat <u>class</u> are you in?\n\nWhat <u>topic</u> do you want?";
   if(memory.name) start = `Welcome back <u>${memory.name}</u>.\n\nWhat topic today?`;
   addMsg(start,"bot");
   input.focus();
@@ -210,7 +211,7 @@ function clearChat(){
   if(confirm("Clear all messages?")){
     chat.innerHTML = "";
     history = [];
-    currentTest = null;
+    currentTest = {};
     addMsg("Chat cleared.\n\nWhat topic?","bot");
   }
   menuBox.classList.remove('show');
@@ -235,23 +236,36 @@ function getTime(){
   return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 }
 
+// FIXED: Auto-add line breaks + format steps
+function formatBotText(txt){
+  return txt
+   .replace(/\*\*Step (\d+):\*\*/g, '\n\n<u>Step $1</u>:') // Force new lines before steps
+   .replace(/\*\*Example\*\*/g, '\n\n<u>Example</u>')
+   .replace(/\*\*Practice\*\*/g, '\n\n<u>Practice</u>')
+   .replace(/\*\*Answer\*\*/g, '\n\n<u>Answer</u>')
+   .replace(/\*\*Clear\?\*\*/g, '\n\n<u>Clear?</u>')
+   .replace(/\n/g, '<br>'); // Convert \n to <br> for HTML
+}
+
 function addMsg(txt,who,calc,testData){
   const div = document.createElement('div');
   div.className = 'msg '+who;
 
-  let html = txt;
+  let html = who === 'bot'? formatBotText(txt) : txt;
 
-  // Add JAMB-style buttons if this is a test question
-  if(testData && testData.options){
-    html += '<div class="test-options">';
-    testData.options.forEach((opt, i) => {
-      const letter = String.fromCharCode(65 + i); // A, B, C, D
-      html += `<button class="test-option" onclick="selectAnswer(${testData.qid}, '${letter}')">${letter}. ${opt}</button>`;
+  // FIXED: Render ALL test questions, not just first one
+  if(testData && Object.keys(testData).length > 0){
+    Object.values(testData).forEach((q, index) => {
+      html += `<br><br><u>Question ${q.qid}</u>: ${q.question}`;
+      html += '<div class="test-options">';
+      q.options.forEach((opt, i) => {
+        const letter = String.fromCharCode(65 + i); // A, B, C, D
+        html += `<button class="test-option" id="q${q.qid}-${letter}" onclick="selectAnswer(${q.qid}, '${letter}')">${letter}. ${opt}</button>`;
+      });
+      html += '</div>';
     });
-    html += '</div>';
   }
 
-  // Add speak button for bot messages
   let timeHtml = `<div class="time">${getTime()}`;
   if(who === 'bot' &&!calc) {
     timeHtml += `<button class="speak-btn" onclick="speakText(\`${txt.replace(/`/g, '\\`')}\`)">🔊</button>`;
@@ -265,19 +279,20 @@ function addMsg(txt,who,calc,testData){
   if(window.MathJax) MathJax.typesetPromise([div]);
 }
 
-// NEW: Handle JAMB button clicks
+// FIXED: Test button logic
 function selectAnswer(qid, answer){
-  if(!currentTest || currentTest[qid].answered) return;
+  if(!currentTest[qid] || currentTest[qid].answered) return;
   currentTest[qid].userAnswer = answer;
   currentTest[qid].answered = true;
 
-  // Visual feedback
-  const buttons = document.querySelectorAll(`.msg:last-child.test-option`);
+  // Visual feedback for that specific question
+  const buttons = document.querySelectorAll(`[id^="q${qid}-"]`);
   buttons.forEach(btn => {
     btn.disabled = true;
-    if(btn.textContent.startsWith(answer)) btn.classList.add('selected');
-    if(btn.textContent.startsWith(currentTest[qid].correct)) btn.classList.add('correct');
-    else if(btn.textContent.startsWith(answer)) btn.classList.add('wrong');
+    const letter = btn.id.split('-')[1];
+    if(letter === answer) btn.classList.add('selected');
+    if(letter === currentTest[qid].correct) btn.classList.add('correct');
+    else if(letter === answer) btn.classList.add('wrong');
   });
 
   // Check if test complete
@@ -286,7 +301,7 @@ function selectAnswer(qid, answer){
     let score = Object.values(currentTest).filter(q => q.userAnswer === q.correct).length;
     let total = Object.keys(currentTest).length;
     setTimeout(() => {
-      addMsg(`Test Done.\n\n<u>Your Score</u>: ${score}/${total}\n\nSay "Submit" to see corrections.`, "bot");
+      addMsg(`Test Done.\n\n<u>Your Score</u>: ${score}/${total}\n\nType "corrections" to see answers.`, "bot");
     }, 500);
   }
 }
@@ -294,15 +309,24 @@ function selectAnswer(qid, answer){
 function localReply(txt){
   txt = txt.toLowerCase().trim();
   if(/^(hello|hi|hey|good morning|good afternoon|good evening|good day|hello\?|hi\?|yo)$/.test(txt)){
-    return memory.name? `Hello <u>${memory.name}</u>.\n\nWhat topic?` : "Hello.\n\nWhat <u>class</u> are you in?\nWhat <u>topic</u>?";
+    return memory.name? `Hello <u>${memory.name}</u>.\n\nWhat topic?` : "Hello.\n\nWhat <u>class</u> are you in?\n\nWhat <u>topic</u>?";
   }
   if(/too fast|slow down|repeat|don't understand/i.test(txt)){
-    return "Ok, I will go <u>slower</u>.\n\nWe do <u>small small steps</u>.\n\nTell me the topic again.";
+    return "Ok.\n\nI will go <u>slower</u>.\n\nWe do <u>small small steps</u>.\n\nTell me the topic again.";
   }
   if(/jss|primary|basic/i.test(txt)){
     memory.level = 'basic';
     localStorage.setItem('mrai',JSON.stringify(memory));
     return "Ok.\n\nI will use <u>very simple words</u>.\n\nNo hard grammar.\n\nWhat topic?";
+  }
+  if(/corrections/i.test(txt) && Object.keys(currentTest).length > 0){
+    let correctionText = "<u>Corrections</u>:\n\n";
+    Object.values(currentTest).forEach(q => {
+      const status = q.userAnswer === q.correct? "✅" : "❌";
+      correctionText += `Q${q.qid}: ${q.question}\nYour answer: ${q.userAnswer} ${status}\nCorrect: ${q.correct}\n\n`;
+    });
+    currentTest = {};
+    return correctionText;
   }
   try{
     if(/^[0-9+\-*/^().\s]+$/.test(txt) && txt.match(/[0-9]/)){
@@ -339,15 +363,7 @@ async function sendToAIWithImage(base64Image){
     if(!res.ok) throw new Error("API error");
     let data = await res.json();
     chat.removeChild(chat.lastChild);
-
-    // Check if response contains test data
-    if(data.testData){
-      currentTest = data.testData;
-      addMsg(data.reply,"bot",false,data.testData[0]); // Pass first question
-    } else {
-      addMsg(data.reply,"bot");
-    }
-
+    addMsg(data.reply,"bot");
     history.push({role:"user",content:"[Image sent]"},{role:"assistant",content:data.reply});
     if(history.length > 10) history = history.slice(-10);
   }catch(e){
@@ -389,12 +405,9 @@ async function send(){
     let data = await res.json();
     chat.removeChild(chat.lastChild);
 
-    // Check if response contains test data
     if(data.testData){
       currentTest = data.testData;
-      // Send first question with buttons
-      const firstQ = Object.values(data.testData)[0];
-      addMsg(firstQ.question,"bot",false,firstQ);
+      addMsg(data.reply,"bot",false,data.testData);
     } else {
       addMsg(data.reply,"bot");
     }
