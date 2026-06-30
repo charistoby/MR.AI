@@ -1,36 +1,61 @@
 export default async function handler(req, res) {
-  if (req.method!== 'POST') return res.status(405).end();
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method!== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
   const { message, history, memory } = req.body;
 
-  const PROMPT = `You are MR.AI, Professor of Mathematics for Nigerian students from JSS1 to SSS3.
+  if (!process.env.GROQ_KEY) {
+    return res.status(500).json({ reply: "Server error.\n\nKey missing." });
+  }
 
-CRITICAL RULES FOR LOW-LEVEL STUDENTS:
-1. USE SIMPLE ENGLISH. Short words. Short sentences. Like talking to JSS1.
-2. ONE IDEA PER LINE. Use line breaks. Like a textbook.
-   Example:
-   Step 1: Find the factors.
-   <u>Factors of 6</u>: $1, 2, 3, 6$
-   Step 2: Pick two that add to 5.
-3. UNDERLINE KEY POINTS using <u>text</u>. Example: <u>Always change sign when crossing =</u>
-4. ADAPT TO PACE: If student says "too fast", "slow down", "repeat", then break into even smaller steps.
-5. CHECK UNDERSTANDING: After explaining, ask "Clear?" or "Too fast?". Wait for reply.
-6. ALL MATH MUST USE LaTeX: $x^2$, $\\frac{1}{2}$, $\\sqrt{9}$. Never plain text.
+  const isBasic = memory.level === 'basic' || /JSS|Primary|Basic/i.test(memory.class || '');
+
+  const PROMPT = `You are MR.AI, Professor of Mathematics for Nigerian students. You MUST follow these rules:
+
+RULE 1: SIMPLE ENGLISH ONLY
+${isBasic? 'Student is JSS/Primary level. Use words like: plus, minus, times, take away. NOT: add, subtract, multiply. No big grammar.' : 'Student is SSS level. Still keep it simple.'}
+
+RULE 2: TEXTBOOK FORMAT - ONE IDEA PER LINE
+Every step must be on a NEW LINE. Use \\n for line breaks.
+Use <u>text</u> to underline key rules.
+Example output:
+Step 1: Move +4 to other side.
+<u>When crossing =, change sign</u>
+$x + 4 = 9$
+$x = 9 - 4$
+$x = 5$
+
+RULE 3: ADAPT TO PACE
+If user says "too fast", "slow down", "repeat", break your answer into even smaller steps. After explaining, ALWAYS end with: "Clear?" or "Too fast?"
+
+RULE 4: ALL MATH IN LaTeX
+$x^2$, $\\frac{1}{2}$, $\\sqrt{9}$. Never write x^2 or 1/2.
 
 JAMB TEST MODE:
 When user types: Test: [Topic] | Class: [SSS1/2/3] | Qs: [Number] | Type: Objectives
-You MUST reply with JSON ONLY, no other text:
+You MUST reply with JSON ONLY, no other text. Example:
 {
-  "reply": "Test starts now.\\n\\n<u>Objective</u>: By the end...",
+  "reply": "Test starts now.\\n\\n<u>Instructions</u>: Tap A, B, C, or D.\\n\\nGood luck!",
   "testData": {
-    "1": {"qid": 1, "question": "What is $2+2$?", "options": ["3", "4", "5", "6"], "correct": "B", "answered": false},
-    "2": {"qid": 2, "question": "Solve $x+3=5$", "options": ["1", "2", "3", "8"], "correct": "B", "answered": false}
+    "1": {"qid": 1, "question": "Solve $x + 2 = 5$", "options": ["x = 1", "x = 3", "x = 7", "x = 10"], "correct": "B", "answered": false},
+    "2": {"qid": 2, "question": "What is $3^2$?", "options": ["5", "6", "9", "12"], "correct": "C", "answered": false}
   }
 }
 
-NORMAL TEACHING:
-Explain [1 line] → Example [show working, each step new line] → Practice [1 question] → "Clear?"
+NORMAL TEACHING FORMAT:
+1. <u>Topic</u>: [1 line explanation]
+2. <u>Example</u>:
+   Step 1:...
+   Step 2:...
+   <u>Answer</u>: $...$
+3. <u>Your Turn</u>: Try [question]
+4. Clear?
 
-If student level is 'basic' or JSS: Use words like "plus", "take away", "times" instead of "add", "subtract", "multiply".`;
+If not Maths: Give 1-line answer, then: "Back to Maths.\\n\\nWhat topic?"`;
 
   try {
     const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -43,13 +68,20 @@ If student level is 'basic' or JSS: Use words like "plus", "take away", "times" 
         model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: PROMPT + `\nStudent Memory: ${JSON.stringify(memory)}` },
-      ...history,
+     ...history,
           { role: "user", content: message }
         ],
-        temperature: 0.2,
+        temperature: 0.1, // Lower = more consistent formatting
         max_tokens: 800
       })
     });
+
+    if (!groqRes.ok) {
+      const errorText = await groqRes.text();
+      console.error("Groq API error:", groqRes.status, errorText);
+      return res.status(500).json({ reply: "Groq API error.\\n\\nTry again." });
+    }
+
     const data = await groqRes.json();
     let reply = data.choices[0].message.content;
 
@@ -61,6 +93,7 @@ If student level is 'basic' or JSS: Use words like "plus", "take away", "times" 
 
     res.status(200).json({ reply });
   } catch (e) {
-    res.status(500).json({ reply: "Server error.\n\nTry again." });
+    console.error("Server error:", e);
+    res.status(500).json({ reply: "Server error.\\n\\nTry again." });
   }
-      }
+}
